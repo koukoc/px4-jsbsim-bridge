@@ -78,7 +78,7 @@ SensorData::Imu SensorImuPlugin::getData() {
   Eigen::Vector3d accel = getAccelFromJSBSim();
   Eigen::Vector3d gyro = getGyroFromJSBSim();
 
-  addNoise(&accel, &gyro, dt);
+  // addNoise(&accel, &gyro, dt);
 
   SensorData::Imu data;
   data.accel_b = accel;

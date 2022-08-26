@@ -59,7 +59,8 @@ SensorData::Airspeed SensorAirspeedPlugin::getData() {
   double diff_pressure = getDiffPressure();
 
   SensorData::Airspeed data;
-  data.diff_pressure = diff_pressure + diff_pressure_noise;
+  // data.diff_pressure = diff_pressure + diff_pressure_noise;
+  data.diff_pressure = diff_pressure ;
 
   _last_sim_time = sim_time;
   return data;

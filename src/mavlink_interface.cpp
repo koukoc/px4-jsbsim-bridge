@@ -166,11 +166,11 @@ void MavlinkInterface::Load() {
       }
 
       // Same as above but for a given port
-      result = setsockopt(simulator_socket_fd_, SOL_SOCKET, SO_REUSEPORT, &socket_reuse, sizeof(socket_reuse));
-      if (result != 0) {
-        std::cerr << "setsockopt failed: " << strerror(errno) << ", aborting\n";
-        abort();
-      }
+      // result = setsockopt(simulator_socket_fd_, SOL_SOCKET, SO_REUSEPORT, &socket_reuse, sizeof(socket_reuse));
+      // if (result != 0) {
+      //   std::cerr << "setsockopt failed: " << strerror(errno) << ", aborting\n";
+      //   abort();
+      // }
 
       // set socket to non-blocking
       result = fcntl(simulator_socket_fd_, F_SETFL, O_NONBLOCK);

@@ -1,13 +1,18 @@
 cmake_minimum_required (VERSION 2.8.11)
 project(jsbsim_bridge)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -pthread")
+SET(TinyXML_LIBRARY "/cygdrive/e/PX4/home/Firmware/tinyxml/libtinyxml.a")
+SET(TinyXML_INCLUDE_DIR "/cygdrive/e/PX4/home/Firmware/tinyxml/")
+# SET(JSBSIM_ROOT_DIR "/cygdrive/c/JSBSim")
+# SET(JSBSIM_INCLUDE_DIR "/cygdrive/c/JSBSim/include")
+# SET(JSBSIM_LIBRARY "/cygdrive/e/PX4/home/Firmware/jsbsim-code/build/src/libJSBSim.dll.a")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 find_package(MAVLink)
 find_package(Boost 1.58 REQUIRED COMPONENTS system thread filesystem)
 find_package(TinyXML REQUIRED)
-
+add_definitions(-g -DTIXML_USE_STL -D_GNU_SOURCE -lcygwin -lSDL2main -fPIC -lSDL2 -mcmodel=medium -m64 -Wl,--image-base -Wl,0x10000000 -llibtinyxml -llibJSBSim )
 message(STATUS "${MAVLINK_INCLUDE_DIRS}")
 
 if (NOT JSBSIM_FOUND)
@@ -46,6 +51,7 @@ if(NOT EIGEN3_FOUND)
   # Fallback to cmake_modules
   find_package(Eigen QUIET)
   if(NOT EIGEN_FOUND)
+  	find_package(PkgConfig REQUIRED)
     pkg_check_modules(EIGEN3 REQUIRED eigen3)
   else()
     set(EIGEN3_INCLUDE_DIRS ${EIGEN_INCLUDE_DIRS})

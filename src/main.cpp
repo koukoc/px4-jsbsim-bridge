@@ -42,7 +42,22 @@
 #include "jsbsim_bridge.h"
 
 int main(int argc, char *argv[]) {
+
   // Parse Configurations
+  //   try
+  // {
+  //   client.confirmConnection();
+
+  // }
+  // catch (rpc::rpc_error& e) {
+  //     const auto msg = e.get_error().as<std::string>();
+  //     std::cout << "Exception raised by the API, something went wrong." << std::endl
+  //               << msg << std::endl;
+  // }
+
+
+
+
   ConfigurationParser config;
   if (argc > 1) {
     // Path to config file

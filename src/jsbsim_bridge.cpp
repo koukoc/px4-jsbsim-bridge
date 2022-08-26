@@ -53,7 +53,7 @@ JSBSimBridge::JSBSimBridge(JSBSim::FGFDMExec *fdmexec, ConfigurationParser &cfg)
 
   // Configure Mavlink HIL interface
   _mavlink_interface = std::make_unique<MavlinkInterface>();
-  SetMavlinkInterfaceConfigs(_mavlink_interface, config);
+  SetMavlinkInterfaceConfigs(_mavlink_interface, _cfg);
 
   _mavlink_interface->Load();
 
@@ -143,13 +143,14 @@ bool JSBSimBridge::SetFdmConfigs(ConfigurationParser &cfg) {
   } else {
     _fdmexec->SetAircraftPath(SGPath(aircraft_path.c_str()));
     _fdmexec->LoadModel(aircraft_model.c_str(), false);
-    JSBSim::FGInitialCondition *initial_condition = _fdmexec->GetIC();
+    auto initial_condition = _fdmexec->GetIC();
     initial_condition->Load(SGPath(init_script_path), false);
     return true;
   }
 }
 
-bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, TiXmlHandle &config) {
+bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> &interface, ConfigurationParser &cfg) {
+  TiXmlHandle config = *cfg.XmlHandle();
   TiXmlElement *mavlink_configs = config.FirstChild("mavlink_interface").Element();
 
   if (!mavlink_configs) return true;  // Nothing to set
@@ -157,10 +158,26 @@ bool JSBSimBridge::SetMavlinkInterfaceConfigs(std::unique_ptr<MavlinkInterface> 
   int tcp_port = kDefaultSITLTcpPort;
   GetConfigElement<int>(config, "mavlink_interface", "tcp_port", tcp_port);
   bool enable_lockstep = true;
+  int udp_port = kDefaultGCSPort;
+  GetConfigElement<int>(config, "mavlink_interface", "udp_port", udp_port);
   GetConfigElement(config, "mavlink_interface", "enable_lockstep", enable_lockstep);
 
-  interface->SetMavlinkTcpPort(tcp_port);
-  interface->SetUseTcp(true);
+  if (cfg.getSerialEnabled()) {
+    // Configure for HITL when serial is enabled
+    interface->SetSerialEnabled(cfg.getSerialEnabled());
+    interface->SetDevice(cfg.getDevice());
+    interface->SetBaudrate(cfg.getBaudrate());
+    interface->SetHILStateLevel(true);
+    interface->SetHILMode(true);
+    interface->SetGcsAddr("INADDR_ANY");
+    interface->SetGcsUdpPort(udp_port);
+
+  } else {
+    // Configure for SITL as default
+    interface->SetMavlinkTcpPort(tcp_port);
+    interface->SetUseTcp(true);
+  }
+
   interface->SetEnableLockstep(enable_lockstep);
 
   return true;
@@ -199,7 +216,12 @@ void JSBSimBridge::Run() {
   }
 
   // Receive and handle actuator controls
-  _mavlink_interface->pollForMAVLinkMessages();
+  bool hil_mode_ = false;
+  if (hil_mode_) {
+    _mavlink_interface->pollFromGcsAndSdk();
+  } else {
+    _mavlink_interface->pollForMAVLinkMessages();
+  }
   Eigen::VectorXd actuator_controls = _mavlink_interface->GetActuatorControls();
 
   if (actuator_controls.size() >= 16) {

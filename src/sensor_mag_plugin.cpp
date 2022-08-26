@@ -67,7 +67,7 @@ SensorData::Magnetometer SensorMagPlugin::getData() {
 
   Eigen::Vector3d mag_b = getMagFromJSBSim();
 
-  addNoise(&mag_b, dt);
+  // addNoise(&mag_b, dt);
 
   SensorData::Magnetometer data;
 

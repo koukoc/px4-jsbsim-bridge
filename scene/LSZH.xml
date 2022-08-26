@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <initialize name="Zurich">
-  <latitude type="geodetic" unit="DEG"> 47.458159 </latitude>
-  <longitude unit="DEG"> 8.548004 </longitude>
+  <latitude type="geodetic" unit="DEG"> 23.963356 </latitude>
+  <longitude unit="DEG"> 120.334663 </longitude>
   <altitude unit="M"> 0.5 </altitude>
   <elevation unit="M"> 419.2 </elevation>
   <vt unit="FT/SEC">      0 </vt>
